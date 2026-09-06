@@ -8,6 +8,8 @@ compra cartas y dados y cierra objetivos secretos en 8 rondas. Sin backend, sin 
 Contra 1-3 bots (cinco arquetipos) o en hot-seat con hasta 4 humanos. La simulación decide el
 resultado de cada tirada y la física solo lo representa: los dados nunca "roban" la partida.
 
+![Tirada resuelta con la tienda abierta](docs/screenshot-tirada.png)
+
 ## Desarrollo
 
 ```bash
