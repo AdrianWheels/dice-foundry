@@ -16,6 +16,7 @@ import { mountLog } from '../ui/Log';
 import { mountMenu } from '../ui/Menu';
 import { mountObjectivePanel } from '../ui/ObjectivePanel';
 import { mountRollControls } from '../ui/RollControls';
+import { mountSettingsPanel } from '../ui/SettingsPanel';
 import { mountShop } from '../ui/Shop';
 import type { Store } from '../ui/store';
 import { type Screen, type Settings, type UiActions, type UiState, humanSeat } from '../ui/uiState';
@@ -33,6 +34,7 @@ export type ControllerEvents = {
   turn: [number];
   gameover: [FinalScore[]];
   screen: [Screen];
+  illegal: [string];
 };
 
 export interface ControllerDeps {
@@ -88,6 +90,7 @@ export class GameController implements UiActions {
       mountForge(root, this.store, this),
       mountEndScreen(root, this.store, this),
       mountHotSeatOverlay(root, this.store, this),
+      mountSettingsPanel(root, this.store, this),
       mountMenu(root, this.store, this, {
         players: prefill.players,
         rounds: prefill.rounds,
@@ -255,6 +258,7 @@ export class GameController implements UiActions {
     } catch (err) {
       if (err instanceof IllegalActionError) {
         console.warn('[GameController] acción ilegal:', err.message);
+        this.events.emit('illegal', err.message);
         return false;
       }
       throw err;

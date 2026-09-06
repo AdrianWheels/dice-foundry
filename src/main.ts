@@ -1,6 +1,8 @@
 import './ui/styles.css';
+import { AudioEngine } from './audio/AudioEngine';
 import { GameController } from './app/GameController';
 import { readParams } from './app/params';
+import { wireAudio } from './app/wireAudio';
 import { mountRollDemo } from './app/rollDemo';
 import { initPhysics } from './physics/world';
 import { createScene } from './render/scene';
@@ -40,6 +42,7 @@ async function main(): Promise<void> {
   if (params.bots) store.set({ settings: { ...store.get().settings, botSpeed: params.bots } });
   const controller = new GameController({ R, canvas, root, store, prefill: params });
   controller.mount();
+  wireAudio(controller, store, new AudioEngine());
   if (import.meta.env.DEV || params.dev || params.e2e) {
     const df = { rolls: 0, mismatches: 0, getState: () => controller.getState() };
     window.__df = df;
