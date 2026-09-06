@@ -1,5 +1,11 @@
 import { decideBotAction } from '../core/bots';
-import { IllegalActionError, applyAction, createGame, currentPlayer } from '../core/game';
+import {
+  IllegalActionError,
+  applyAction,
+  createGame,
+  currentPlayer,
+  rerollCost,
+} from '../core/game';
 import { deriveSeed } from '../core/rng';
 import type { FinalScore, GameAction, GameConfig, GameState } from '../core/types';
 import type { Transform } from '../physics/dieBody';
@@ -46,6 +52,7 @@ export type ControllerEvents = {
   gameover: [FinalScore[]];
   screen: [Screen];
   illegal: [string];
+  reroll: [number, number];
 };
 
 export interface ControllerDeps {
@@ -228,7 +235,9 @@ export class GameController implements UiActions {
   reroll(dieId: number): void {
     const g = this.state;
     if (!g || g.phase !== 'mitigate' || !humanSeat(g) || this.busy()) return;
+    const cost = rerollCost(g);
     if (!this.apply({ type: 'reroll', dieId })) return;
+    this.events.emit('reroll', g.round, cost);
     void this.showRoll(1, dieId);
   }
 

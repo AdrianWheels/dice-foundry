@@ -4,7 +4,10 @@ import { GameController } from './app/GameController';
 import { readParams } from './app/params';
 import { wireAudio } from './app/wireAudio';
 import { wireEffects } from './app/wireEffects';
-import { loadGame, loadHints, loadSettings } from './app/persistence';
+import { anonId, loadGame, loadHints, loadSettings } from './app/persistence';
+import { consoleSink, createTelemetry, posthogSink, type TelemetrySink } from './app/telemetry';
+import { wireTelemetry } from './app/wireTelemetry';
+import { APP_VERSION } from './app/version';
 import { mountRollDemo } from './app/rollDemo';
 import { initPhysics } from './physics/world';
 import { createScene } from './render/scene';
@@ -54,6 +57,30 @@ async function main(): Promise<void> {
   const fx = controller.effectDeps();
   if (fx) wireEffects(controller, store, fx);
   window.addEventListener('beforeunload', () => controller.flush());
+
+  const sinks: TelemetrySink[] = [];
+  if (import.meta.env.DEV) sinks.push(consoleSink);
+  const phKey = import.meta.env.VITE_POSTHOG_KEY;
+  if (phKey) {
+    sinks.push(
+      posthogSink({
+        key: phKey,
+        host: import.meta.env.VITE_POSTHOG_HOST ?? 'https://eu.i.posthog.com',
+        distinctId: anonId(storage),
+      }),
+    );
+  }
+  wireTelemetry(
+    controller,
+    store,
+    createTelemetry(sinks, { app: 'dice-foundry', version: APP_VERSION }),
+  );
+  // Solo en un despliegue real: en `vite preview` el script de Vercel da 404 y ensucia la consola.
+  const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  if (import.meta.env.PROD && !isLocal) {
+    const { inject } = await import('@vercel/analytics');
+    inject();
+  }
   if (import.meta.env.DEV || params.dev || params.e2e) {
     const df = { rolls: 0, mismatches: 0, getState: () => controller.getState() };
     window.__df = df;
