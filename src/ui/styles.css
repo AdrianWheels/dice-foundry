@@ -3,8 +3,11 @@
   --bg: #1b1f2a;
   --panel: rgba(20, 24, 33, 0.88);
   --fg: #f2f0ea;
+  --muted: #9aa3b2;
   --accent: #f5c542;
   --pv: #b39dff;
+  --line: rgba(255, 255, 255, 0.12);
+  --radius: 12px;
 }
 html,
 body {
@@ -17,6 +20,7 @@ body {
     -apple-system,
     'Segoe UI',
     sans-serif;
+  font-size: 15px;
   overflow: hidden;
 }
 #scene {
@@ -31,7 +35,229 @@ body {
   position: fixed;
   inset: 0;
   pointer-events: none;
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) 1fr minmax(240px, 340px);
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  padding: 12px;
+  box-sizing: border-box;
 }
 #app > * {
   pointer-events: auto;
+}
+
+/* Paneles */
+.panel {
+  min-width: 0;
+}
+.panel > * {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  backdrop-filter: blur(6px);
+}
+h1 {
+  font-size: 26px;
+  margin: 0 0 2px;
+}
+h2 {
+  font-size: 19px;
+  margin: 0 0 8px;
+}
+h3 {
+  font-size: 14px;
+  margin: 0 0 6px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+p {
+  margin: 4px 0;
+}
+button {
+  font: inherit;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+button.primary {
+  background: var(--accent);
+  color: #241a00;
+  border-color: transparent;
+  font-weight: 600;
+}
+select,
+input {
+  font: inherit;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 8px;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.field {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 0;
+}
+
+/* Colocación en la rejilla */
+.hud {
+  grid-column: 1;
+  grid-row: 1;
+}
+.objective-panel {
+  grid-column: 3;
+  grid-row: 1;
+}
+.shop-panel {
+  grid-column: 3;
+  grid-row: 2 / span 2;
+  overflow-y: auto;
+}
+.log-panel {
+  grid-column: 1;
+  grid-row: 3;
+}
+.roll-controls-wrap {
+  grid-column: 2;
+  grid-row: 3;
+  align-self: end;
+  justify-self: center;
+}
+
+.hud-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 600;
+}
+.hud-stats {
+  display: flex;
+  gap: 14px;
+  margin-top: 6px;
+  color: var(--accent);
+}
+.hud-players {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.hud-players li {
+  padding: 2px 0;
+}
+.hud-players li[data-active='true'] {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.roll-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+[data-busy='true'] button {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.log ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 26vh;
+  overflow-y: auto;
+  font-size: 13px;
+}
+.log li {
+  padding: 3px 0;
+  border-bottom: 1px solid var(--line);
+}
+.empty {
+  color: var(--muted);
+}
+
+.objective-name {
+  font-weight: 600;
+}
+.objective-desc,
+.objective-reward {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Superposiciones centradas */
+.menu-panel,
+.end-panel,
+.handoff-wrap {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 12, 18, 0.72);
+  z-index: 10;
+}
+.menu-panel:empty,
+.end-panel:empty,
+.handoff-wrap:empty {
+  display: none;
+}
+.menu,
+.end-screen,
+.handoff {
+  min-width: 320px;
+  max-width: min(92vw, 560px);
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.tagline {
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.seats {
+  margin: 6px 0;
+}
+.scores {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 14px;
+}
+.scores th,
+.scores td {
+  text-align: left;
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--line);
+}
+.scores .total {
+  font-weight: 700;
+  color: var(--accent);
+}
+.winner {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
 }
