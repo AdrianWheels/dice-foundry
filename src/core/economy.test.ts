@@ -44,7 +44,7 @@ describe('precios', () => {
 
   it('itemPrice e itemId', () => {
     expect(itemPrice({ kind: 'card', cardId: 'card_income' }, p())).toBe(6);
-    expect(itemPrice({ kind: 'face', faceId: 'pv3' }, p())).toBe(8);
+    expect(itemPrice({ kind: 'face', faceId: 'pv3' }, p())).toBe(6);
     expect(itemId({ kind: 'face', faceId: 'g3' })).toBe('face:g3');
     expect(itemId({ kind: 'card', cardId: 'card_tax' })).toBe('card:card_tax');
   });

@@ -170,9 +170,10 @@ describe('tienda', () => {
 
   it('no se puede forjar sin oro, en un dado ajeno ni en un temporal', () => {
     const slot = shopState().shop.slots.findIndex((i) => i?.kind === 'face');
-    expect(() => applyAction(shopState(0), { type: 'buyFace', slot, dieId: 1, side: 0 })).toThrow(
-      /oro/,
-    );
+    // La tirada previa abona oro, así que se vacía la bolsa ya en fase de tienda.
+    const rich = shopState(0);
+    const broke: GameState = { ...rich, players: rich.players.map((p) => ({ ...p, gold: 0 })) };
+    expect(() => applyAction(broke, { type: 'buyFace', slot, dieId: 1, side: 0 })).toThrow(/oro/);
     expect(() => applyAction(shopState(), { type: 'buyFace', slot, dieId: 3, side: 0 })).toThrow(
       /permanentes propios/,
     );

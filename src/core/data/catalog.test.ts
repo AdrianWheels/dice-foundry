@@ -32,7 +32,7 @@ describe('catálogo de caras', () => {
     expect(face('x2gold').effect).toEqual({ kind: 'multiplier', resource: 'gold', factor: 2 });
     expect(face('risk_pv').effect).toEqual({ kind: 'risk', chance: 0.25, pv: 8 });
     expect(face('spawn_perm')).toMatchObject({
-      cost: 7,
+      cost: 4,
       effect: { kind: 'spawn', permanent: true },
     });
     expect(face('meta_dice').effect).toEqual({ kind: 'scaling', per: 'dice', every: 2, pv: 1 });
@@ -51,19 +51,19 @@ describe('catálogo de cartas', () => {
       kind: 'endScore',
       per: 'dice',
       from: 3,
-      pv: 2,
+      pv: 3,
     });
     expect(() => card('nope')).toThrow(/Carta desconocida/);
   });
 });
 
 describe('catálogo de objetivos', () => {
-  it('tiene 8 objetivos de 5-6 PV con id = clave', () => {
+  it('tiene 8 objetivos de 9-10 PV con id = clave', () => {
     expect(OBJECTIVE_IDS).toHaveLength(8);
     for (const [k, o] of Object.entries(OBJECTIVES)) {
       expect(o.id).toBe(k);
-      expect(o.pv).toBeGreaterThanOrEqual(5);
-      expect(o.pv).toBeLessThanOrEqual(6);
+      expect(o.pv).toBeGreaterThanOrEqual(9);
+      expect(o.pv).toBeLessThanOrEqual(10);
     }
     expect(objective('obj_engineer').check).toEqual({ kind: 'minDice', count: 4 });
     expect(() => objective('nope')).toThrow(/Objetivo desconocido/);

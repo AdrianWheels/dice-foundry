@@ -66,56 +66,56 @@ Definidos como datos en `src/core/data/faces.ts`, `cards.ts`, `objectives.ts`. F
 
 ### Caras (`FaceDef`)
 
-| id               | familia    | nombre              | descripción (es)                                         | coste            | efecto                                                        |
-| ---------------- | ---------- | ------------------- | -------------------------------------------------------- | ---------------- | ------------------------------------------------------------- |
-| `blank`          | blank      | Cara vacía          | No hace nada.                                            | — (no comprable) | `{ kind:'blank' }`                                            |
-| `g1`             | economy    | Moneda              | +1 oro.                                                  | —                | `{ kind:'gain', gold:1 }`                                     |
-| `g2`             | economy    | Dos monedas         | +2 oro.                                                  | —                | `{ kind:'gain', gold:2 }`                                     |
-| `pv1`            | pv         | Laurel              | +1 PV.                                                   | —                | `{ kind:'gain', pv:1 }`                                       |
-| `g3`             | economy    | Bolsa               | +3 oro.                                                  | 3                | `{ kind:'gain', gold:3 }`                                     |
-| `g4`             | economy    | Cofre               | +4 oro.                                                  | 5                | `{ kind:'gain', gold:4 }`                                     |
-| `pv2`            | pv         | Corona              | +2 PV.                                                   | 5                | `{ kind:'gain', pv:2 }`                                       |
-| `pv3`            | pv         | Trono               | +3 PV.                                                   | 8                | `{ kind:'gain', pv:3 }`                                       |
-| `x2gold`         | multiplier | Forja ardiente      | Duplica el oro de esta tirada.                           | 6                | `{ kind:'multiplier', resource:'gold', factor:2 }`            |
-| `combo_gold`     | combo      | Eco dorado          | +3 oro si otro dado muestra Economía.                    | 4                | `{ kind:'combo', requires:'economy', gold:3 }`                |
-| `combo_pv`       | combo      | Resonancia          | +2 PV si otro dado muestra PV.                           | 5                | `{ kind:'combo', requires:'pv', pv:2 }`                       |
-| `spawn_temp`     | generator  | Chispa              | Añade un dado temporal para tu próxima tirada.           | 4                | `{ kind:'spawn', permanent:false }`                           |
-| `spawn_perm`     | generator  | Semilla             | Añade un dado permanente. Después esta cara queda vacía. | 7                | `{ kind:'spawn', permanent:true }`                            |
-| `risk_gold`      | risk       | Apuesta             | 50 %: +6 oro. Si no, nada.                               | 4                | `{ kind:'risk', chance:0.5, gold:6 }`                         |
-| `risk_pv`        | risk       | Todo o nada         | 25 %: +8 PV. Si no, nada.                                | 6                | `{ kind:'risk', chance:0.25, pv:8 }`                          |
-| `control_copy`   | control    | Espejo              | Copia la mejor cara de otro dado.                        | 6                | `{ kind:'control', mode:'copyBest' }`                         |
-| `control_reroll` | control    | Segunda oportunidad | El relanzamiento de este turno es gratis.                | 3                | `{ kind:'control', mode:'freeReroll' }`                       |
-| `convert`        | conversion | Alquimia            | Convierte 3 oro en 2 PV automáticamente.                 | 4                | `{ kind:'convert', from:'gold', amount:3, to:'pv', yield:2 }` |
-| `meta_dice`      | meta       | Legado              | +1 PV por cada 2 dados permanentes.                      | 5                | `{ kind:'scaling', per:'dice', every:2, pv:1 }`               |
-| `meta_cards`     | meta       | Tesorero            | +1 oro por cada carta que tengas.                        | 3                | `{ kind:'scaling', per:'cards', every:1, gold:1 }`            |
+| id               | familia    | nombre              | descripción (es)                                         | coste            | efecto                                                      |
+| ---------------- | ---------- | ------------------- | -------------------------------------------------------- | ---------------- | ----------------------------------------------------------- |
+| `blank`          | blank      | Cara vacía          | No hace nada.                                            | — (no comprable) | `{kind:'blank'}`                                            |
+| `g1`             | economy    | Moneda              | +1 oro.                                                  | —                | `{kind:'gain', gold:1}`                                     |
+| `g2`             | economy    | Dos monedas         | +2 oro.                                                  | —                | `{kind:'gain', gold:2}`                                     |
+| `pv1`            | pv         | Laurel              | +1 PV.                                                   | —                | `{kind:'gain', pv:1}`                                       |
+| `g3`             | economy    | Bolsa               | +3 oro.                                                  | 3                | `{kind:'gain', gold:3}`                                     |
+| `g4`             | economy    | Cofre               | +4 oro.                                                  | 5                | `{kind:'gain', gold:4}`                                     |
+| `pv2`            | pv         | Corona              | +2 PV.                                                   | 5                | `{kind:'gain', pv:2}`                                       |
+| `pv3`            | pv         | Trono               | +3 PV.                                                   | 6                | `{kind:'gain', pv:3}`                                       |
+| `x2gold`         | multiplier | Forja ardiente      | Duplica el oro de esta tirada.                           | 2                | `{kind:'multiplier', resource:'gold', factor:2}`            |
+| `combo_gold`     | combo      | Eco dorado          | +3 oro si otro dado muestra Economía.                    | 2                | `{kind:'combo', requires:'economy', gold:3}`                |
+| `combo_pv`       | combo      | Resonancia          | +2 PV si otro dado muestra PV.                           | 3                | `{kind:'combo', requires:'pv', pv:2}`                       |
+| `spawn_temp`     | generator  | Chispa              | Añade un dado temporal para tu próxima tirada.           | 3                | `{kind:'spawn', permanent:false}`                           |
+| `spawn_perm`     | generator  | Semilla             | Añade un dado permanente. Después esta cara queda vacía. | 4                | `{kind:'spawn', permanent:true}`                            |
+| `risk_gold`      | risk       | Apuesta             | 50 %: +6 oro. Si no, nada.                               | 4                | `{kind:'risk', chance:0.5, gold:6}`                         |
+| `risk_pv`        | risk       | Todo o nada         | 25 %: +8 PV. Si no, nada.                                | 6                | `{kind:'risk', chance:0.25, pv:8}`                          |
+| `control_copy`   | control    | Espejo              | Copia la mejor cara de otro dado.                        | 3                | `{kind:'control', mode:'copyBest'}`                         |
+| `control_reroll` | control    | Segunda oportunidad | El relanzamiento de este turno es gratis.                | 2                | `{kind:'control', mode:'freeReroll'}`                       |
+| `convert`        | conversion | Alquimia            | Convierte 3 oro en 2 PV automáticamente.                 | 2                | `{kind:'convert', from:'gold', amount:3, to:'pv', yield:2}` |
+| `meta_dice`      | meta       | Legado              | +1 PV por cada 2 dados permanentes.                      | 3                | `{kind:'scaling', per:'dice', every:2, pv:1}`               |
+| `meta_cards`     | meta       | Tesorero            | +1 oro por cada carta que tengas.                        | 2                | `{kind:'scaling', per:'cards', every:1, gold:1}`            |
 
 Caras comprables: 16 (todas menos `blank`, `g1`, `g2`, `pv1`).
 
 ### Cartas (`CardDef`)
 
-| id                | tipo        | nombre               | descripción (es)                                    | coste | efecto                                           |
-| ----------------- | ----------- | -------------------- | --------------------------------------------------- | ----- | ------------------------------------------------ |
-| `card_income`     | economy     | Mina                 | +1 oro en cada tirada.                              | 6     | `{ kind:'rollBonus', gold:1 }`                   |
-| `card_bigroll`    | economy     | Manos grandes        | +1 oro extra si tiras 3 dados o más.                | 5     | `{ kind:'rollBonus', gold:1, minDice:3 }`        |
-| `card_cheapfaces` | economy     | Gremio de forjadores | Las caras cuestan 1 oro menos.                      | 6     | `{ kind:'discount', target:'face', amount:1 }`   |
-| `card_cheapdice`  | dice        | Fundición            | Los dados cuestan 3 oro menos.                      | 7     | `{ kind:'discount', target:'die', amount:3 }`    |
-| `card_score_dice` | scoring     | Arsenal              | Al final: +2 PV por cada dado a partir del tercero. | 6     | `{ kind:'endScore', per:'dice', from:3, pv:2 }`  |
-| `card_score_gold` | scoring     | Tesoro               | Al final: +1 PV por cada 4 oro.                     | 5     | `{ kind:'endScore', per:'gold', every:4, pv:1 }` |
-| `card_reroll`     | dice        | Dado cargado         | Relanzar un dado es gratis.                         | 4     | `{ kind:'freeReroll' }`                          |
-| `card_tax`        | interaction | Recaudador           | Ganas 1 oro cuando otro jugador compra un dado.     | 4     | `{ kind:'tax', trigger:'buyDie', gold:1 }`       |
+| id                | tipo        | nombre               | descripción (es)                                    | coste | efecto                                         |
+| ----------------- | ----------- | -------------------- | --------------------------------------------------- | ----- | ---------------------------------------------- |
+| `card_income`     | economy     | Mina                 | +1 oro en cada tirada.                              | 6     | `{kind:'rollBonus', gold:1}`                   |
+| `card_bigroll`    | economy     | Manos grandes        | +1 oro extra si tiras 3 dados o más.                | 5     | `{kind:'rollBonus', gold:1, minDice:3}`        |
+| `card_cheapfaces` | economy     | Gremio de forjadores | Las caras cuestan 1 oro menos.                      | 5     | `{kind:'discount', target:'face', amount:1}`   |
+| `card_cheapdice`  | dice        | Fundición            | Los dados cuestan 3 oro menos.                      | 7     | `{kind:'discount', target:'die', amount:3}`    |
+| `card_score_dice` | scoring     | Arsenal              | Al final: +3 PV por cada dado a partir del tercero. | 8     | `{kind:'endScore', per:'dice', from:3, pv:3}`  |
+| `card_score_gold` | scoring     | Tesoro               | Al final: +1 PV por cada 3 oro.                     | 7     | `{kind:'endScore', per:'gold', every:3, pv:1}` |
+| `card_reroll`     | dice        | Dado cargado         | Relanzar un dado es gratis.                         | 4     | `{kind:'freeReroll'}`                          |
+| `card_tax`        | interaction | Recaudador           | Ganas 1 oro cuando otro jugador compra un dado.     | 4     | `{kind:'tax', trigger:'buyDie', gold:1}`       |
 
 ### Objetivos secretos (`ObjectiveDef`) — 1 por jugador, sin repetir
 
 | id              | nombre        | condición al final de partida                      | PV  |
 | --------------- | ------------- | -------------------------------------------------- | --- |
-| `obj_engineer`  | Ingeniero     | ≥ 4 dados permanentes                              | 6   |
-| `obj_magnate`   | Magnate       | ≥ 12 oro sin gastar                                | 5   |
-| `obj_purist`    | Purista       | ninguna cara `blank` en tus dados                  | 5   |
-| `obj_gambler`   | Apostador     | ≥ 3 caras de familia `risk` instaladas             | 6   |
-| `obj_collector` | Coleccionista | ≥ 3 cartas                                         | 5   |
-| `obj_smith`     | Forjador      | ≥ 6 caras compradas instaladas (ids con coste)     | 6   |
-| `obj_scorer`    | Puntuador     | ≥ 4 caras de familia `pv` instaladas               | 5   |
-| `obj_balanced`  | Equilibrado   | cada dado tiene ≥ 1 cara `pv` y ≥ 1 cara `economy` | 5   |
+| `obj_engineer`  | Ingeniero     | ≥ 4 dados permanentes                              | 10  |
+| `obj_magnate`   | Magnate       | ≥ 12 oro sin gastar                                | 9   |
+| `obj_purist`    | Purista       | ninguna cara `blank` en tus dados                  | 9   |
+| `obj_gambler`   | Apostador     | ≥ 3 caras de familia `risk` instaladas             | 10  |
+| `obj_collector` | Coleccionista | ≥ 3 cartas                                         | 9   |
+| `obj_smith`     | Forjador      | ≥ 6 caras compradas instaladas (ids con coste)     | 10  |
+| `obj_scorer`    | Puntuador     | ≥ 4 caras de familia `pv` instaladas               | 9   |
+| `obj_balanced`  | Equilibrado   | cada dado tiene ≥ 1 cara `pv` y ≥ 1 cara `economy` | 9   |
 
 ### Arquetipos de bot (`BotArchetype`)
 
