@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { createScene } from './render/scene';
 import { createTable } from './render/table';
 import { APP_VERSION } from './app/version';
+import { mountRollDemo } from './app/rollDemo';
 
 async function boot(): Promise<void> {
   const app = document.getElementById('app');
@@ -43,8 +44,17 @@ function devScene(): void {
 }
 
 const params = new URLSearchParams(location.search);
-if (params.get('dev') === 'scene') {
+const dev = params.get('dev');
+if (dev === 'scene') {
   devScene();
+} else if (dev === 'roll') {
+  const canvas = document.getElementById('scene') as HTMLCanvasElement;
+  const app = document.getElementById('app');
+  if (app) {
+    void mountRollDemo(canvas, app, Number(params.get('seed') ?? 1)).catch((err: unknown) => {
+      console.error(err);
+    });
+  }
 } else {
   boot().catch((err: unknown) => {
     const status = document.querySelector('[data-testid="boot-status"]');
