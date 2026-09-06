@@ -32,7 +32,7 @@ describe('catálogo de caras', () => {
     expect(face('x2gold').effect).toEqual({ kind: 'multiplier', resource: 'gold', factor: 2 });
     expect(face('risk_pv').effect).toEqual({ kind: 'risk', chance: 0.25, pv: 8 });
     expect(face('spawn_perm')).toMatchObject({
-      cost: 4,
+      cost: 2,
       effect: { kind: 'spawn', permanent: true },
     });
     expect(face('meta_dice').effect).toEqual({ kind: 'scaling', per: 'dice', every: 2, pv: 1 });

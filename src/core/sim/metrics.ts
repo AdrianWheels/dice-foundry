@@ -33,6 +33,10 @@ export interface BatchMetrics {
   blowoutRate: number;
   itemStats: Record<string, ItemStat>;
   buildDistribution: Record<BuildLabel, number>;
+  /** Fracción de jugadores que acaba con esa build. */
+  buildShare: Record<BuildLabel, number>;
+  /** P(ganar | build). Con n arquetipos, la referencia neutra es 1/n. */
+  buildWinRate: Record<BuildLabel, number>;
   objectiveRate: number;
 }
 
@@ -56,6 +60,7 @@ export function runBatch(opts: BatchOptions): BatchMetrics {
   const itemGamesBought: Record<string, number> = {};
   const itemWins: Record<string, number> = {};
   const builds = Object.fromEntries(BUILDS.map((b) => [b, 0])) as Record<BuildLabel, number>;
+  const buildWins = Object.fromEntries(BUILDS.map((b) => [b, 0])) as Record<BuildLabel, number>;
   let winnerTotal = 0;
   let total = 0;
   let goldLeft = 0;
@@ -108,7 +113,10 @@ export function runBatch(opts: BatchOptions): BatchMetrics {
         itemWins[id] = (itemWins[id] ?? 0) + 1;
       }
     }
-    for (const b of game.builds) builds[b]++;
+    game.builds.forEach((b, seat) => {
+      builds[b]++;
+      if (game.winners.includes(seat)) buildWins[b] += share;
+    });
   }
 
   const players = opts.games * n;
@@ -146,6 +154,13 @@ export function runBatch(opts: BatchOptions): BatchMetrics {
     blowoutRate: blowouts / opts.games,
     itemStats,
     buildDistribution: builds,
+    buildShare: Object.fromEntries(BUILDS.map((b) => [b, builds[b] / players])) as Record<
+      BuildLabel,
+      number
+    >,
+    buildWinRate: Object.fromEntries(
+      BUILDS.map((b) => [b, builds[b] > 0 ? buildWins[b] / builds[b] : 0]),
+    ) as Record<BuildLabel, number>,
     objectiveRate: objectives / players,
   };
 }
@@ -163,20 +178,48 @@ export function checkThresholds(m: BatchMetrics): { ok: boolean; failures: strin
   }
   const seatSpread = Math.max(...m.winRateBySeat) - Math.min(...m.winRateBySeat);
   if (seatSpread > 0.1) f.push(`ventaja por asiento = ${seatSpread.toFixed(3)} > 0.10`);
-  if (m.leaderMidWinRate > 0.6) {
-    f.push(`líder a mitad gana ${m.leaderMidWinRate.toFixed(3)} > 0.60 (snowball)`);
+  // El líder a mitad de partida parte de 1/n por puro azar: el umbral es relativo.
+  const leaderCap = 1 / n + 0.35;
+  if (m.leaderMidWinRate > leaderCap) {
+    f.push(
+      `líder a mitad gana ${m.leaderMidWinRate.toFixed(3)} > ${leaderCap.toFixed(2)} (snowball)`,
+    );
   }
-  if (m.blowoutRate > 0.25) f.push(`blowouts ${m.blowoutRate.toFixed(3)} > 0.25`);
+  // "Ganador ≥ 2× el segundo": con 2 jugadores el segundo es el único rival y salta mucho más.
+  const blowCap = n >= 3 ? 0.25 : 0.4;
+  if (m.blowoutRate > blowCap) {
+    f.push(`blowouts ${m.blowoutRate.toFixed(3)} > ${blowCap.toFixed(2)}`);
+  }
   for (const [id, s] of Object.entries(m.itemStats)) {
     if (id === 'die' || s.offered < 30) continue;
     if (s.rate < 0.03) f.push(`ítem muerto ${id}: rate ${s.rate.toFixed(3)} < 0.03`);
     if (s.rate > 0.6) f.push(`ítem dominante ${id}: rate ${s.rate.toFixed(3)} > 0.60`);
   }
-  if (m.avgWinnerTotal < 15 || m.avgWinnerTotal > 40) {
-    f.push(`PV medio del ganador ${m.avgWinnerTotal.toFixed(1)} fuera de [15, 40]`);
+  // El PV del ganador es el máximo de n jugadores, así que crece con n aunque la economía no
+  // cambie: se acota el PV MEDIO (independiente de n) y se exige que el ganador destaque.
+  if (m.avgTotal < 8 || m.avgTotal > 30) {
+    f.push(`PV medio por jugador ${m.avgTotal.toFixed(1)} fuera de [8, 30]`);
+  }
+  if (m.avgWinnerTotal > 40) {
+    f.push(`PV medio del ganador ${m.avgWinnerTotal.toFixed(1)} > 40`);
+  }
+  if (m.avgWinnerTotal < m.avgTotal * 1.15) {
+    f.push(
+      `el ganador no destaca: ${m.avgWinnerTotal.toFixed(1)} < ${(m.avgTotal * 1.15).toFixed(1)}`,
+    );
   }
   if (m.avgDice < 2.5 || m.avgDice > 6) {
     f.push(`dados medios ${m.avgDice.toFixed(2)} fuera de [2.5, 6]`);
+  }
+  const buildCap = 1.8 / n;
+  for (const [b, share] of Object.entries(m.buildShare)) {
+    if (share <= 0.1) continue;
+    const wr = m.buildWinRate[b as BuildLabel] ?? 0;
+    if (wr > buildCap) {
+      f.push(
+        `build dominante ${b}: gana ${wr.toFixed(3)} > ${buildCap.toFixed(3)} con cuota ${share.toFixed(2)}`,
+      );
+    }
   }
   return { ok: f.length === 0, failures: f };
 }
@@ -213,8 +256,12 @@ export function renderMarkdown(m: BatchMetrics): string {
       `| ${id} | ${s.offered} | ${s.bought} | ${pct(s.rate)} | ${pct(s.winRateWhenBought)} |`,
     );
   }
-  lines.push('', '## Builds', '', '| Build | Jugadores |', '|---|---|');
-  for (const [b, c] of Object.entries(m.buildDistribution)) lines.push(`| ${b} | ${c} |`);
+  lines.push('', '## Builds', '', '| Build | Jugadores | Cuota | Gana |', '|---|---|---|---|');
+  for (const [b, c] of Object.entries(m.buildDistribution)) {
+    lines.push(
+      `| ${b} | ${c} | ${pct(m.buildShare[b as BuildLabel] ?? 0)} | ${pct(m.buildWinRate[b as BuildLabel] ?? 0)} |`,
+    );
+  }
   const t = checkThresholds(m);
   lines.push(
     '',

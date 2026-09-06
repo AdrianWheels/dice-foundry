@@ -46,7 +46,7 @@ export const CARDS: Record<CardId, CardDef> = {
     type: 'scoring',
     name: 'Tesoro',
     description: 'Al final: +1 PV por cada 3 oro.',
-    cost: 7,
+    cost: 8,
     effect: { kind: 'endScore', per: 'gold', every: 3, pv: 1 },
   },
   card_reroll: {

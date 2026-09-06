@@ -46,7 +46,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'economy',
     name: 'Cofre',
     description: '+4 oro.',
-    cost: 5,
+    cost: 4,
     effect: { kind: 'gain', gold: 4 },
   },
   pv2: {
@@ -54,7 +54,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'pv',
     name: 'Corona',
     description: '+2 PV.',
-    cost: 5,
+    cost: 4,
     effect: { kind: 'gain', pv: 2 },
   },
   pv3: {
@@ -70,7 +70,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'multiplier',
     name: 'Forja ardiente',
     description: 'Duplica el oro de esta tirada.',
-    cost: 2,
+    cost: 1,
     effect: { kind: 'multiplier', resource: 'gold', factor: 2 },
   },
   combo_gold: {
@@ -86,7 +86,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'combo',
     name: 'Resonancia',
     description: '+2 PV si otro dado muestra PV.',
-    cost: 3,
+    cost: 2,
     effect: { kind: 'combo', requires: 'pv', pv: 2 },
   },
   spawn_temp: {
@@ -94,7 +94,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'generator',
     name: 'Chispa',
     description: 'Añade un dado temporal para tu próxima tirada.',
-    cost: 3,
+    cost: 1,
     effect: { kind: 'spawn', permanent: false },
   },
   spawn_perm: {
@@ -102,7 +102,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'generator',
     name: 'Semilla',
     description: 'Añade un dado permanente. Después esta cara queda vacía.',
-    cost: 4,
+    cost: 2,
     effect: { kind: 'spawn', permanent: true },
   },
   risk_gold: {
@@ -126,7 +126,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'control',
     name: 'Espejo',
     description: 'Copia la mejor cara de otro dado.',
-    cost: 3,
+    cost: 2,
     effect: { kind: 'control', mode: 'copyBest' },
   },
   control_reroll: {
@@ -134,7 +134,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'control',
     name: 'Segunda oportunidad',
     description: 'El relanzamiento de este turno es gratis.',
-    cost: 2,
+    cost: 1,
     effect: { kind: 'control', mode: 'freeReroll' },
   },
   convert: {
@@ -142,7 +142,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'conversion',
     name: 'Alquimia',
     description: 'Convierte 3 oro en 2 PV automáticamente.',
-    cost: 2,
+    cost: 1,
     effect: { kind: 'convert', from: 'gold', amount: 3, to: 'pv', yield: 2 },
   },
   meta_dice: {
@@ -150,7 +150,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'meta',
     name: 'Legado',
     description: '+1 PV por cada 2 dados permanentes.',
-    cost: 3,
+    cost: 2,
     effect: { kind: 'scaling', per: 'dice', every: 2, pv: 1 },
   },
   meta_cards: {
@@ -158,7 +158,7 @@ export const FACES: Record<FaceId, FaceDef> = {
     family: 'meta',
     name: 'Tesorero',
     description: '+1 oro por cada carta que tengas.',
-    cost: 2,
+    cost: 1,
     effect: { kind: 'scaling', per: 'cards', every: 1, gold: 1 },
   },
 };
