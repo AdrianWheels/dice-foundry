@@ -1,35 +1,15 @@
 import './ui/styles.css';
-import RAPIER from '@dimforge/rapier3d-compat';
-import * as THREE from 'three';
+import { GameController } from './app/GameController';
+import { readParams } from './app/params';
+import { mountRollDemo } from './app/rollDemo';
+import { initPhysics } from './physics/world';
 import { createScene } from './render/scene';
 import { createTable } from './render/table';
-import { APP_VERSION } from './app/version';
-import { mountRollDemo } from './app/rollDemo';
+import { createStore } from './ui/store';
+import { initialUiState } from './ui/uiState';
 
-async function boot(): Promise<void> {
-  const app = document.getElementById('app');
-  if (!app) throw new Error('#app no existe');
-  const status = document.createElement('p');
-  status.dataset.testid = 'boot-status';
-  status.textContent = 'Cargando…';
-  app.append(status);
-
-  await RAPIER.init();
-  const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
-  world.step();
-  world.free();
-
-  const canvas = document.getElementById('scene') as HTMLCanvasElement;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setSize(64, 64, false);
-  renderer.dispose();
-
-  status.textContent = `OK rapier+three v${APP_VERSION}`;
-}
-
-/** Banco de pruebas de la escena (Tarea 14): `/?dev=scene`. */
-function devScene(): void {
-  const canvas = document.getElementById('scene') as HTMLCanvasElement;
+/** Banco de pruebas de la escena: `/?dev=scene`. */
+function devScene(canvas: HTMLCanvasElement, root: HTMLElement): void {
   const ctx = createScene(canvas);
   createTable(ctx.scene);
   const tick = (): void => {
@@ -40,25 +20,41 @@ function devScene(): void {
   const status = document.createElement('p');
   status.dataset.testid = 'boot-status';
   status.textContent = 'OK scene';
-  document.getElementById('app')?.append(status);
+  root.append(status);
 }
 
-const params = new URLSearchParams(location.search);
-const dev = params.get('dev');
-if (dev === 'scene') {
-  devScene();
-} else if (dev === 'roll') {
+async function main(): Promise<void> {
+  const params = readParams(location.search);
   const canvas = document.getElementById('scene') as HTMLCanvasElement;
-  const app = document.getElementById('app');
-  if (app) {
-    void mountRollDemo(canvas, app, Number(params.get('seed') ?? 1)).catch((err: unknown) => {
-      console.error(err);
+  const root = document.getElementById('app') as HTMLElement;
+  if (params.dev === 'scene') {
+    devScene(canvas, root);
+    return;
+  }
+  if (params.dev === 'roll') {
+    await mountRollDemo(canvas, root, params.seed ?? 1);
+    return;
+  }
+  const R = await initPhysics();
+  const store = createStore(initialUiState());
+  if (params.bots) store.set({ settings: { ...store.get().settings, botSpeed: params.bots } });
+  const controller = new GameController({ R, canvas, root, store, prefill: params });
+  controller.mount();
+  if (import.meta.env.DEV || params.dev || params.e2e) {
+    const df = { rolls: 0, mismatches: 0, getState: () => controller.getState() };
+    window.__df = df;
+    controller.events.on('roll:settled', (o) => {
+      df.rolls++;
+      df.mismatches += o.mismatches;
     });
   }
-} else {
-  boot().catch((err: unknown) => {
-    const status = document.querySelector('[data-testid="boot-status"]');
-    if (status) status.textContent = `ERROR ${String(err)}`;
-    console.error(err);
-  });
+  const status = document.createElement('p');
+  status.dataset.testid = 'boot-status';
+  status.hidden = true;
+  status.textContent = 'OK rapier+three';
+  root.append(status);
 }
+
+main().catch((err: unknown) => {
+  console.error(err);
+});

@@ -1,4 +1,5 @@
 import { STARTER_FACES } from '../core/data/faces';
+import type { GameState } from '../core/types';
 import { Rng, deriveSeed } from '../core/rng';
 import { DieMesh } from '../render/dieMesh';
 import { createScene } from '../render/scene';
@@ -8,7 +9,12 @@ import { RollRunner } from './RollRunner';
 
 declare global {
   interface Window {
-    __df?: { rolls: number; mismatches: number; lastTopSides: Record<number, number> };
+    __df?: {
+      rolls: number;
+      mismatches: number;
+      lastTopSides?: Record<number, number>;
+      getState?: () => GameState | null;
+    };
   }
 }
 

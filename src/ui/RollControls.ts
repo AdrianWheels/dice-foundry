@@ -12,7 +12,7 @@ export function mountRollControls(
   const el = h('div', { class: 'panel roll-controls-wrap' });
   root.append(el);
   const unsub = mount(el, store, (s) => {
-    if (s.screen !== 'game' || !s.game) return null;
+    if (!s.game || s.screen === 'menu') return null;
     const g = s.game;
     const busy = s.rolling || s.botThinking;
     const me = currentPlayer(g);
