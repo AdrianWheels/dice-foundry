@@ -23,6 +23,15 @@ import { mountShop } from '../ui/Shop';
 import type { Store } from '../ui/store';
 import { type Screen, type Settings, type UiActions, type UiState, humanSeat } from '../ui/uiState';
 import { createEmitter } from './emitter';
+import {
+  type StorageLike,
+  bumpStat,
+  clearGame,
+  loadGame,
+  saveGame,
+  saveHints,
+  saveSettings,
+} from './persistence';
 import { RollRunner, type RollOutcome } from './RollRunner';
 import type { UrlParams } from './params';
 
@@ -45,6 +54,8 @@ export interface ControllerDeps {
   root: HTMLElement;
   store: Store<UiState>;
   prefill: UrlParams;
+  /** Persistencia (Tarea 22). Sin storage el juego funciona igual, sin autosave. */
+  storage?: StorageLike;
 }
 
 const TRAY_X = -4;
@@ -154,9 +165,15 @@ export class GameController implements UiActions {
     return this.state;
   }
 
+  /** Guarda la partida en curso (para `beforeunload`). */
+  flush(): void {
+    if (this.state && this.state.phase !== 'gameOver') this.autosave(this.state);
+  }
+
   // ---------------------------------------------------------------- UiActions
 
   startGame(cfg: GameConfig): void {
+    if (this.deps.storage) bumpStat(this.deps.storage, 'gamesStarted', Date.now());
     this.cfg = cfg;
     this.state = createGame(cfg);
     this.clearMeshes();
@@ -176,13 +193,29 @@ export class GameController implements UiActions {
   }
 
   resumeGame(): void {
-    // La Tarea 22 (persistencia) rellena este hueco; sin save disponible no hace nada.
-    const saved = this.store.get().game;
-    if (!saved) return;
+    const storage = this.deps.storage;
+    const saved = storage ? loadGame(storage) : null;
+    if (!saved) {
+      this.store.set({ resumeAvailable: false });
+      return;
+    }
     this.state = saved;
     this.cfg = saved.config;
-    this.store.set({ screen: 'game', forgeSlot: null, handoffSeat: null });
+    this.clearMeshes();
+    this.restTransforms.clear();
+    this.store.set({
+      screen: 'game',
+      game: saved,
+      forgeSlot: null,
+      handoffSeat: null,
+      rolling: false,
+      botThinking: false,
+    });
+    this.events.emit('screen', 'game');
     this.syncDiceMeshes();
+    if (saved.roll) this.showRolledStatic();
+    this.events.emit('turn', saved.currentSeat);
+    if (!humanSeat(saved)) void this.runBotTurn();
   }
 
   roll(): void {
@@ -253,6 +286,7 @@ export class GameController implements UiActions {
 
   playAgain(): void {
     if (!this.cfg) return;
+    if (this.deps.storage) bumpStat(this.deps.storage, 'playAgainClicks', Date.now());
     this.startGame({ ...this.cfg, seed: this.cfg.seed + 1 });
   }
 
@@ -272,16 +306,52 @@ export class GameController implements UiActions {
   }
 
   updateSettings(patch: Partial<Settings>): void {
-    this.store.set({ settings: { ...this.store.get().settings, ...patch } });
+    const settings = { ...this.store.get().settings, ...patch };
+    this.store.set({ settings });
+    if (this.deps.storage) saveSettings(this.deps.storage, settings);
   }
 
   dismissHint(id: string): void {
     const seen = this.store.get().hintsSeen;
     if (seen.includes(id)) return;
-    this.store.set({ hintsSeen: [...seen, id] });
+    const hintsSeen = [...seen, id];
+    this.store.set({ hintsSeen });
+    if (this.deps.storage) saveHints(this.deps.storage, hintsSeen);
   }
 
   // ------------------------------------------------------------------ interno
+
+  private autosave(state: GameState): void {
+    const storage = this.deps.storage;
+    if (!storage) return;
+    if (state.phase === 'gameOver') {
+      clearGame(storage);
+      bumpStat(storage, 'gamesFinished', Date.now());
+      this.store.set({ resumeAvailable: false });
+      return;
+    }
+    saveGame(storage, state, Date.now());
+    this.store.set({ resumeAvailable: true });
+  }
+
+  /** Coloca los dados de una tirada ya resuelta sin simular (al reanudar un save). */
+  private showRolledStatic(): void {
+    const g = this.state;
+    if (!g?.roll) return;
+    g.roll.results.forEach((r, i) => {
+      const mesh = this.meshes.get(r.dieId);
+      if (!mesh) return;
+      mesh.applySideMap(sideMapFor(2, r.faceIndex));
+      const t: Transform = {
+        position: { x: -1.5 + i * 1.2, y: TRAY_Y, z: 0 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+      };
+      mesh.syncFrom(t);
+      mesh.highlight(2);
+      this.restTransforms.set(r.dieId, t);
+    });
+    this.ctx?.render();
+  }
 
   private busy(): boolean {
     const s = this.store.get();
@@ -294,6 +364,7 @@ export class GameController implements UiActions {
       this.state = applyAction(this.state, a);
       this.store.set({ game: this.state });
       this.events.emit('state', this.state);
+      this.autosave(this.state);
       return true;
     } catch (err) {
       if (err instanceof IllegalActionError) {

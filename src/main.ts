@@ -4,6 +4,7 @@ import { GameController } from './app/GameController';
 import { readParams } from './app/params';
 import { wireAudio } from './app/wireAudio';
 import { wireEffects } from './app/wireEffects';
+import { loadGame, loadHints, loadSettings } from './app/persistence';
 import { mountRollDemo } from './app/rollDemo';
 import { initPhysics } from './physics/world';
 import { createScene } from './render/scene';
@@ -39,13 +40,20 @@ async function main(): Promise<void> {
     return;
   }
   const R = await initPhysics();
+  const storage = localStorage;
   const store = createStore(initialUiState());
+  store.set({
+    settings: loadSettings(storage),
+    hintsSeen: loadHints(storage),
+    resumeAvailable: loadGame(storage) !== null,
+  });
   if (params.bots) store.set({ settings: { ...store.get().settings, botSpeed: params.bots } });
-  const controller = new GameController({ R, canvas, root, store, prefill: params });
+  const controller = new GameController({ R, canvas, root, store, prefill: params, storage });
   controller.mount();
   wireAudio(controller, store, new AudioEngine());
   const fx = controller.effectDeps();
   if (fx) wireEffects(controller, store, fx);
+  window.addEventListener('beforeunload', () => controller.flush());
   if (import.meta.env.DEV || params.dev || params.e2e) {
     const df = { rolls: 0, mismatches: 0, getState: () => controller.getState() };
     window.__df = df;
