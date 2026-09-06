@@ -26,7 +26,7 @@ export function mountForge(
     const newFace = face(item.faceId);
     return h(
       'div',
-      { testid: 'forge', class: 'forge' },
+      { testid: 'forge', class: 'forge forge-sheet' },
       h('h2', {}, fmt(S.forge.title, { name: newFace.name })),
       renderItemCard(item, itemPrice(item, me)),
       h('p', { class: 'forge-hint' }, S.forge.hint),

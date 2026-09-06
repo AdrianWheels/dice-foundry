@@ -23,5 +23,18 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testIgnore: /mobile\.spec\.ts/,
+    },
+    {
+      // Viewport y táctil de iPhone 13 sobre Chromium: el CI solo instala chromium y lo que se
+      // valida aquí es el layout, no el motor.
+      name: 'mobile',
+      use: { ...devices['iPhone 13'], browserName: 'chromium' },
+      testMatch: /mobile\.spec\.ts/,
+    },
+  ],
 });

@@ -14,7 +14,7 @@ import type { Rapier } from '../physics/world';
 import { DieMesh } from '../render/dieMesh';
 import { CoinBurst, FloatingLabels } from '../render/effects';
 import { type LoopHandle, createLoop } from '../render/loop';
-import { type SceneCtx, createScene } from '../render/scene';
+import { type SceneCtx, type SceneOptions, createScene } from '../render/scene';
 import { createTable } from '../render/table';
 import { mountEndScreen } from '../ui/EndScreen';
 import { mountForge } from '../ui/Forge';
@@ -63,6 +63,8 @@ export interface ControllerDeps {
   prefill: UrlParams;
   /** Persistencia (Tarea 22). Sin storage el juego funciona igual, sin autosave. */
   storage?: StorageLike;
+  /** Ajustes de render (Tarea 26): en móvil se baja el DPR y se apagan las sombras. */
+  scene?: SceneOptions;
 }
 
 const TRAY_X = -4;
@@ -98,7 +100,7 @@ export class GameController implements UiActions {
   }
 
   mount(): void {
-    const ctx = createScene(this.deps.canvas);
+    const ctx = createScene(this.deps.canvas, this.deps.scene);
     createTable(ctx.scene);
     this.ctx = ctx;
     const layer = document.createElement('div');

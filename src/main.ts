@@ -51,7 +51,16 @@ async function main(): Promise<void> {
     resumeAvailable: loadGame(storage) !== null,
   });
   if (params.bots) store.set({ settings: { ...store.get().settings, botSpeed: params.bots } });
-  const controller = new GameController({ R, canvas, root, store, prefill: params, storage });
+  const coarse = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+  const controller = new GameController({
+    R,
+    canvas,
+    root,
+    store,
+    prefill: params,
+    storage,
+    scene: coarse ? { maxPixelRatio: 1.5, shadows: false } : {},
+  });
   controller.mount();
   wireAudio(controller, store, new AudioEngine());
   const fx = controller.effectDeps();
