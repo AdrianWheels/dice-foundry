@@ -11,6 +11,14 @@ npm run check      # lint + typecheck + tests
 npm run e2e        # Playwright
 ```
 
+## Simulador de balance
+
+```bash
+npm run sim -- --games 2000 --seats magnate,scorer,engineer,casino --rounds 8 --seed 1
+```
+
+Escribe `docs/balance/latest.md` (winrates, ítems, builds, umbrales). Los números del juego viven en `src/core/data/*.ts`; cada cambio se anota en `docs/balance/CHANGELOG.md`.
+
 ## Documentación
 
 - Reglas: `docs/rules.md`
