@@ -3,16 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Dice Foundry</title>
+    <title>Dice Foundry — lanza, cobra, forja</title>
     <meta
       name="description"
       content="Lanza dados físicos, forja sus caras y construye la mejor máquina de puntos. Juego de estrategia gratuito en el navegador."
     />
+    <meta name="theme-color" content="#1b1f2a" />
     <link rel="icon" href="./favicon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Dice Foundry" />
+    <meta
+      property="og:description"
+      content="Lanza dados físicos, forja sus caras y construye la mejor máquina de puntos. Gratis, sin registro, en el navegador."
+    />
+    <meta property="og:image" content="./favicon.svg" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Dice Foundry" />
+    <meta
+      name="twitter:description"
+      content="Juego de dados estratégico en el navegador: lanza, cobra, forja, repite."
+    />
   </head>
   <body>
     <canvas id="scene" aria-hidden="true"></canvas>
     <div id="app"></div>
+    <noscript>
+      <p style="padding: 24px; font-family: system-ui, sans-serif; color: #f2f0ea">
+        Dice Foundry necesita JavaScript para simular los dados. Activa JavaScript y recarga la
+        página.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

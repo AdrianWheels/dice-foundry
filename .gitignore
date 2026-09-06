@@ -13,3 +13,5 @@ test-results
 .DS_Store
 .claude/*
 !.claude/launch.json
+
+.vercel
