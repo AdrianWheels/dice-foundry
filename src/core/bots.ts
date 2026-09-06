@@ -92,8 +92,8 @@ export function scorePurchase(
 ): number {
   const w = ARCHETYPE_WEIGHTS[arch];
   const ctx = evContext(me);
-  let benefit = 0;
-  let price = 0;
+  let benefit: number;
+  let price: number;
   if (a.type === 'buyFace') {
     const item = state.shop.slots[a.slot];
     const die = me.dice.find((d) => d.id === a.dieId);
