@@ -29,6 +29,15 @@ export async function startGame(page: Page, params = ''): Promise<void> {
   await expectPhase(page, 'roll');
 }
 
+/** Descarta la pista visible, si hay: un jugador real hace lo mismo antes de seguir. */
+export async function dismissHints(page: Page): Promise<void> {
+  const btn = page.locator('[data-testid^="hint-dismiss-"]');
+  for (let i = 0; i < 3; i++) {
+    if ((await btn.count()) === 0) return;
+    await btn.first().click();
+  }
+}
+
 /** En móvil la tienda es un panel plegable: se abre si existe el interruptor. */
 async function openShopIfCollapsed(page: Page): Promise<void> {
   const toggle = page.getByTestId('shop-toggle');
@@ -44,11 +53,13 @@ export async function playHumanTurn(
 ): Promise<{ bought: boolean }> {
   await expectPhase(page, 'roll');
   await expect(page.getByTestId('roll-controls')).toHaveAttribute('data-busy', 'false');
+  await dismissHints(page);
   await page.getByTestId('btn-roll').click();
   await expectPhase(page, 'mitigate');
   await page.getByTestId('btn-pass').click();
   await expectPhase(page, 'shop');
   let bought = false;
+  await dismissHints(page);
   await openShopIfCollapsed(page);
   if (opts.buyFace) {
     const slot = page.locator('[data-testid^="shop-slot-"][data-kind="face"]').first();

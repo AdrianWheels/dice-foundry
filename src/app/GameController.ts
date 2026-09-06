@@ -18,6 +18,7 @@ import { type SceneCtx, type SceneOptions, createScene } from '../render/scene';
 import { createTable } from '../render/table';
 import { mountEndScreen } from '../ui/EndScreen';
 import { mountForge } from '../ui/Forge';
+import { mountHints } from '../ui/Hints';
 import { mountHotSeatOverlay } from '../ui/HotSeatOverlay';
 import { mountHud } from '../ui/Hud';
 import { mountLog } from '../ui/Log';
@@ -123,6 +124,7 @@ export class GameController implements UiActions {
       mountEndScreen(root, this.store, this),
       mountHotSeatOverlay(root, this.store, this),
       mountSettingsPanel(root, this.store, this),
+      mountHints(root, this.store, this),
       mountMenu(root, this.store, this, {
         players: prefill.players,
         rounds: prefill.rounds,

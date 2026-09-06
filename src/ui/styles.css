@@ -532,3 +532,44 @@ input {
     right: 8px;
   }
 }
+
+/* Pistas de primera partida */
+.hints-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 13;
+  max-width: min(92vw, 420px);
+}
+.hints-wrap:empty {
+  display: none;
+}
+.hint {
+  background: var(--accent);
+  color: #241a00;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.hint p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.hint button {
+  background: rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #241a00;
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  /* Arriba: abajo taparía la tienda y los controles, que ocupan casi toda la pantalla. */
+  .hints-wrap {
+    top: calc(96px + env(safe-area-inset-top));
+    bottom: auto;
+  }
+}
