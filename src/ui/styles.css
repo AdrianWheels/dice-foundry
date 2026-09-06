@@ -1,0 +1,37 @@
+:root {
+  color-scheme: dark;
+  --bg: #1b1f2a;
+  --panel: rgba(20, 24, 33, 0.88);
+  --fg: #f2f0ea;
+  --accent: #f5c542;
+  --pv: #b39dff;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  overflow: hidden;
+}
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  touch-action: none;
+}
+#app {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+#app > * {
+  pointer-events: auto;
+}
