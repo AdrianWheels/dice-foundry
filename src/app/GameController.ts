@@ -6,6 +6,8 @@ import type { Transform } from '../physics/dieBody';
 import { type DieSpec, type RestingDie, sideMapFor } from '../physics/preroll';
 import type { Rapier } from '../physics/world';
 import { DieMesh } from '../render/dieMesh';
+import { CoinBurst, FloatingLabels } from '../render/effects';
+import { type LoopHandle, createLoop } from '../render/loop';
 import { type SceneCtx, createScene } from '../render/scene';
 import { createTable } from '../render/table';
 import { mountEndScreen } from '../ui/EndScreen';
@@ -66,6 +68,10 @@ export class GameController implements UiActions {
   private state: GameState | null = null;
   private cfg: GameConfig | null = null;
   private botRunning = false;
+  private labels: FloatingLabels | null = null;
+  private burst: CoinBurst | null = null;
+  private ambient: LoopHandle | null = null;
+  private lastFxTime = 0;
   private unmounts: (() => void)[] = [];
 
   constructor(deps: ControllerDeps) {
@@ -77,8 +83,14 @@ export class GameController implements UiActions {
     const ctx = createScene(this.deps.canvas);
     createTable(ctx.scene);
     this.ctx = ctx;
+    const layer = document.createElement('div');
+    layer.id = 'fx-layer';
+    this.deps.root.append(layer);
+    this.labels = new FloatingLabels(layer, ctx.camera);
+    this.burst = new CoinBurst(ctx.scene);
     this.runner = new RollRunner(this.deps.R, ctx, this.meshes, {
       onContact: (dieId, force) => this.events.emit('roll:contact', dieId, force),
+      onRender: () => this.updateEffects(),
     });
     const { root, prefill } = this.deps;
     this.unmounts = [
@@ -98,10 +110,38 @@ export class GameController implements UiActions {
         seats: prefill.seats as never,
       }),
     ];
+    this.lastFxTime = performance.now();
+    this.ambient = createLoop({
+      step: () => undefined,
+      render: () => {
+        this.updateEffects();
+        ctx.render();
+      },
+    });
+    this.ambient.start();
     ctx.render();
   }
 
+  /** Etiquetas y partículas: se actualizan tanto en el bucle ambiente como durante la tirada. */
+  private updateEffects(): void {
+    const now = performance.now();
+    const dt = Math.min(0.05, (now - this.lastFxTime) / 1000);
+    this.lastFxTime = now;
+    this.labels?.update(now);
+    this.burst?.update(dt);
+  }
+
+  /** Dependencias para `wireEffects` (Tarea 21). */
+  effectDeps(): { labels: FloatingLabels; burst: CoinBurst; meshes: Map<number, DieMesh> } | null {
+    if (!this.labels || !this.burst) return null;
+    return { labels: this.labels, burst: this.burst, meshes: this.meshes };
+  }
+
   unmount(): void {
+    this.ambient?.stop();
+    this.ambient = null;
+    this.labels?.clear();
+    this.burst?.dispose();
     this.runner?.cancel();
     for (const off of this.unmounts) off();
     this.unmounts = [];
@@ -337,6 +377,7 @@ export class GameController implements UiActions {
       }
     }
     this.store.set({ rolling: true });
+    this.ambient?.stop();
     try {
       const outcome = await runner.roll(
         dice,
@@ -347,6 +388,8 @@ export class GameController implements UiActions {
       for (const [id, t] of outcome.transforms) this.restTransforms.set(id, t);
       this.events.emit('roll:settled', outcome);
     } finally {
+      this.lastFxTime = performance.now();
+      this.ambient?.start();
       this.store.set({ rolling: false, game: this.state });
     }
   }

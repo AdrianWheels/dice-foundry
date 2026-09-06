@@ -29,7 +29,7 @@ export class RollRunner {
     private readonly R: Rapier,
     private readonly ctx: SceneCtx,
     private readonly meshes: Map<number, DieMesh>,
-    private readonly opts: { onContact?: ContactListener } = {},
+    private readonly opts: { onContact?: ContactListener; onRender?: () => void } = {},
   ) {}
 
   roll(
@@ -64,6 +64,7 @@ export class RollRunner {
           for (const id of ids) this.meshes.get(id)?.syncFrom(readTransform(getBody(pw, id)));
         },
         render: () => {
+          this.opts.onRender?.();
           this.ctx.render();
           if (pw.step >= plan.settleStep) finish();
         },

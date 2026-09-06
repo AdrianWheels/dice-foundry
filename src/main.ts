@@ -3,6 +3,7 @@ import { AudioEngine } from './audio/AudioEngine';
 import { GameController } from './app/GameController';
 import { readParams } from './app/params';
 import { wireAudio } from './app/wireAudio';
+import { wireEffects } from './app/wireEffects';
 import { mountRollDemo } from './app/rollDemo';
 import { initPhysics } from './physics/world';
 import { createScene } from './render/scene';
@@ -43,6 +44,8 @@ async function main(): Promise<void> {
   const controller = new GameController({ R, canvas, root, store, prefill: params });
   controller.mount();
   wireAudio(controller, store, new AudioEngine());
+  const fx = controller.effectDeps();
+  if (fx) wireEffects(controller, store, fx);
   if (import.meta.env.DEV || params.dev || params.e2e) {
     const df = { rolls: 0, mismatches: 0, getState: () => controller.getState() };
     window.__df = df;
