@@ -60,7 +60,7 @@ export function makeThrowParams(rng: RandomSource, index: number, count: number)
   return {
     position: { x: -TABLE.halfX + 1 + j() * 0.4, y: 2 + rng.next() * 0.8, z: z + j() * 0.3 },
     rotation: randomQuat(rng),
-    linvel: { x: 9 + rng.next() * 4, y: 1 + rng.next() * 1.5, z: j() * 3 },
+    linvel: { x: 5 + rng.next() * 3, y: 1 + rng.next() * 1.5, z: j() * 3 },
     angvel: { x: j() * 24, y: j() * 24, z: j() * 24 },
   };
 }
